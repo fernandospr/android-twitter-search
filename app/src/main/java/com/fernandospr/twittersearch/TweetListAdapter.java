@@ -13,8 +13,8 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
 
     private List<Tweet> mTweetList;
 
-    public void update(List<Tweet> mTweetList) {
-        this.mTweetList = mTweetList;
+    public void update(List<Tweet> tweetList) {
+        this.mTweetList = tweetList;
         this.notifyDataSetChanged();
     }
 
