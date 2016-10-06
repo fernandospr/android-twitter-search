@@ -7,17 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.ViewHolder> {
 
+    private final TweetDateFormatter mFormatter;
     private List<Tweet> mTweetList;
 
-    public TweetListAdapter() {
+    public TweetListAdapter(TweetDateFormatter formatter) {
         this.mTweetList = new ArrayList<>();
+        this.mFormatter = formatter;
     }
 
     public void update(List<Tweet> tweetList) {
@@ -37,8 +37,7 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         Tweet tweet = mTweetList.get(position);
         holder.content.setText(tweet.getContent());
-        DateFormat format = SimpleDateFormat.getTimeInstance();
-        holder.createdAt.setText(format.format(tweet.getCreatedAt()));
+        holder.createdAt.setText(mFormatter.format(holder.itemView.getContext(), tweet.getCreatedAt()));
         holder.username.setText(tweet.getUsername());
     }
 

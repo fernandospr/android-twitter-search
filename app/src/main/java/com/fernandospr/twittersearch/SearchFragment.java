@@ -95,7 +95,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void setupTweetListView() {
-        mAdapter = new TweetListAdapter();
+        mAdapter = new TweetListAdapter(new TweetDateFormatter());
         mTweetsRecyclerView.setAdapter(mAdapter);
         mTweetsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
