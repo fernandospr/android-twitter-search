@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Twitter Search</string>
     <string name="input_search_terms">Input search terms</string>
+
+    <string name="base_url">https://api.twitter.com/</string>
+    <string name="consumer_key">Xkg8shf0G5Y893Q3wVwY0xaic</string>
+    <string name="consumer_secret">1ujUA65iZZDtHV5XYMe7zoI9gDFB6S1CabOujpDYay9orwyDMc</string>
+
 </resources>
