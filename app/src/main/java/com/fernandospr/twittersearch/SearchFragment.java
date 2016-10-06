@@ -1,24 +1,35 @@
 package com.fernandospr.twittersearch;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.fernandospr.twittersearch.repository.RepositoryCallback;
+import com.fernandospr.twittersearch.repository.TwitterRepository;
+
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SearchFragment extends Fragment {
+
+    private final static long TIMER_DELAY = 1000;
 
     private EditText mSearchEditText;
     private RecyclerView mTweetsRecyclerView;
     private TweetListAdapter mAdapter;
+    private SearchFragmentListener mListener;
+    private Timer mTimer;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -27,6 +38,17 @@ public class SearchFragment extends Fragment {
     public static SearchFragment newInstance() {
         SearchFragment fragment = new SearchFragment();
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof SearchFragmentListener) {
+            mListener = (SearchFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement SearchFragmentListener");
+        }
     }
 
     @Override
@@ -51,6 +73,8 @@ public class SearchFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             // TODO: Restore tweets
+        } else {
+            showHelp();
         }
     }
 
@@ -61,11 +85,14 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        // TODO: Stop retrieving tweets
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
+        if (mListener != null) {
+            mListener.getRepository().stop();
+        }
+        cancelScheduledSearch();
+        mListener = null;
     }
-
 
     private void setupTweetListView() {
         mAdapter = new TweetListAdapter();
@@ -87,12 +114,63 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                // TODO: Retrieve tweets
+                String query = editable.toString();
+                cancelScheduledSearch();
+                if (TextUtils.isEmpty(query)) {
+                    showHelp();
+                } else {
+                    scheduleSearch(editable.toString());
+                }
             }
         });
     }
 
+    private void cancelScheduledSearch() {
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+    }
+
+    private void scheduleSearch(final String query) {
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getTweetList(query);
+            }
+        }, TIMER_DELAY);
+    }
+
+    private void getTweetList(String query) {
+        if (mListener != null) {
+            mListener.getRepository().getTweetList(query, new RepositoryCallback<List<Tweet>>() {
+                @Override
+                public void onSuccess(List<Tweet> tweetList) {
+                    showTweetList(tweetList);
+                }
+
+                @Override
+                public void onFailure(Throwable error) {
+                    showError(error.getMessage());
+                }
+            });
+        }
+    }
+
+    private void showError(String message) {
+        // TODO: Hide loading, show error
+    }
+
+    private void showHelp() {
+        // TODO: show help
+    }
+
     private void showTweetList(List<Tweet> tweetList) {
         mAdapter.update(tweetList);
+        // TODO: Hide loading, show recyclerview
+    }
+
+    public interface SearchFragmentListener {
+        TwitterRepository getRepository();
     }
 }
