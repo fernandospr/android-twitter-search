@@ -14,7 +14,7 @@ public class TwitterSearchApp extends Application {
         mTwitterRepository = new TwitterRepository(this,
                 getString(R.string.base_url),
                 getString(R.string.consumer_key),
-                getString(R.string.consumer_key));
+                getString(R.string.consumer_secret));
     }
 
     public TwitterRepository getRepository() {

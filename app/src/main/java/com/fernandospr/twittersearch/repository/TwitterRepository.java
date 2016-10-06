@@ -84,6 +84,7 @@ public class TwitterRepository {
                 if (callback != null) {
                     if (response.isSuccessful()) {
                         saveAccessToken(response.body().getAccessToken());
+                        callback.onSuccess(null);
                     }
                 }
             }
@@ -101,7 +102,7 @@ public class TwitterRepository {
         try {
             String consumerKeyAndSecret = mConsumerKey + ":" + mConsumerSecret;
             byte[] data = consumerKeyAndSecret.getBytes("UTF-8");
-            String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+            String base64 = Base64.encodeToString(data, Base64.NO_WRAP);
 
             return "Basic " + base64;
         } catch (UnsupportedEncodingException e) {
