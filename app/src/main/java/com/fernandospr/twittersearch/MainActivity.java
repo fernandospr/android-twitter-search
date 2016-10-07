@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity
         SearchView.OnQueryTextListener {
 
     private SearchFragment mFragment;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +33,8 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setOnQueryTextListener(this);
 
         return true;
     }
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextSubmit(String query) {
         if (mFragment.isVisible()) {
             mFragment.onQueryTextSubmit(query);
+            mSearchView.clearFocus();
             return true;
         }
 
