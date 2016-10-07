@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.ViewHolder> {
@@ -16,7 +15,6 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
     private List<Tweet> mTweetList;
 
     public TweetListAdapter(TweetDateFormatter formatter) {
-        this.mTweetList = new ArrayList<>();
         this.mFormatter = formatter;
     }
 
@@ -43,7 +41,7 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
 
     @Override
     public int getItemCount() {
-        return mTweetList.size();
+        return mTweetList == null ? 0 : mTweetList.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

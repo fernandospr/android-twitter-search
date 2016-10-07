@@ -2,6 +2,7 @@ package com.fernandospr.twittersearch;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,14 +16,17 @@ import android.widget.ProgressBar;
 import com.fernandospr.twittersearch.repository.RepositoryCallback;
 import com.fernandospr.twittersearch.repository.TwitterRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
 
+    private static final String TWEET_LIST_KEY = "TWEET_LIST_KEY";
     private RecyclerView mTweetsRecyclerView;
     private TweetListAdapter mAdapter;
     private SearchFragmentListener mListener;
     private ProgressBar mProgressBar;
+    private List<Tweet> mTweetList;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -58,14 +62,16 @@ public class SearchFragment extends Fragment {
         setupTweetListView();
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        hideLoading();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            // TODO: Restore tweets
+            mTweetList = savedInstanceState.getParcelableArrayList(TWEET_LIST_KEY);
+            if (mTweetList != null) {
+                showTweetList(mTweetList);
+            }
         } else {
             showHelp();
         }
@@ -74,7 +80,9 @@ public class SearchFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // TODO: Save tweets
+        if (mTweetList != null) {
+            outState.putParcelableArrayList(TWEET_LIST_KEY, new ArrayList<Parcelable>(mTweetList));
+        }
     }
 
     @Override
@@ -104,6 +112,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void showTweetList(List<Tweet> tweetList) {
+        mTweetList = tweetList;
         mAdapter.update(tweetList);
         showLoading(false);
         showRecyclerView(true);
