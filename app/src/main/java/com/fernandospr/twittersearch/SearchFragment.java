@@ -27,14 +27,12 @@ public class SearchFragment extends Fragment {
     private SearchFragmentListener mListener;
     private ProgressBar mProgressBar;
     private List<Tweet> mTweetList;
+    private View mEmptyView;
+    private View mErrorView;
+    private View mHelpView;
 
     public SearchFragment() {
         // Required empty public constructor
-    }
-
-    public static SearchFragment newInstance() {
-        SearchFragment fragment = new SearchFragment();
-        return fragment;
     }
 
     @Override
@@ -62,6 +60,12 @@ public class SearchFragment extends Fragment {
         setupTweetListView();
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
+        mEmptyView = view.findViewById(R.id.emptyView);
+
+        mErrorView = view.findViewById(R.id.errorView);
+
+        mHelpView = view.findViewById(R.id.helpView);
     }
 
     @Override
@@ -71,10 +75,11 @@ public class SearchFragment extends Fragment {
             mTweetList = savedInstanceState.getParcelableArrayList(TWEET_LIST_KEY);
             if (mTweetList != null) {
                 showTweetList(mTweetList);
+                return;
             }
-        } else {
-            showHelp();
         }
+
+        showHelp();
     }
 
     @Override
@@ -100,25 +105,6 @@ public class SearchFragment extends Fragment {
         mTweetsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void showError(String message) {
-        showLoading(false);
-        // TODO: Show error
-    }
-
-    private void showHelp() {
-        showLoading(false);
-        showRecyclerView(false);
-        // TODO: Show help
-    }
-
-    private void showTweetList(List<Tweet> tweetList) {
-        mTweetList = tweetList;
-        mAdapter.update(tweetList);
-        showLoading(false);
-        showRecyclerView(true);
-        // TODO: Check if empty
-    }
-
     public void onQueryTextSubmit(String query) {
         if (TextUtils.isEmpty(query)) {
             showHelp();
@@ -129,8 +115,7 @@ public class SearchFragment extends Fragment {
 
     private void getTweetList(String query) {
         if (mListener != null) {
-            showLoading(true);
-            showRecyclerView(false);
+            showLoading();
             mListener.getRepository().getTweetList(query, new RepositoryCallback<List<Tweet>>() {
                 @Override
                 public void onSuccess(List<Tweet> tweetList) {
@@ -145,20 +130,64 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private void showLoading(boolean visible) {
-        if (visible) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mProgressBar.setVisibility(View.GONE);
-        }
+    private void showLoading() {
+        showLoadingView(true);
+        showEmptyView(false);
+        showRecyclerView(false);
+        showErrorView(false);
+        showHelpView(false);
+    }
+
+    private void showError(String message) {
+        showLoadingView(false);
+        showEmptyView(false);
+        showRecyclerView(false);
+        showErrorView(true);
+        showHelpView(false);
+    }
+
+    private void showHelp() {
+        showLoadingView(false);
+        showEmptyView(false);
+        showRecyclerView(false);
+        showErrorView(false);
+        showHelpView(true);
+    }
+
+    private void showTweetList(List<Tweet> tweetList) {
+        mTweetList = tweetList;
+        mAdapter.update(tweetList);
+        boolean empty = tweetList == null || tweetList.size() == 0;
+
+        showLoadingView(false);
+        showEmptyView(empty);
+        showRecyclerView(!empty);
+        showErrorView(false);
+        showHelpView(false);
+    }
+
+    private void showLoadingView(boolean visible) {
+        showView(mProgressBar, visible);
+    }
+
+    private void showEmptyView(boolean visible) {
+        showView(mEmptyView, visible);
     }
 
     private void showRecyclerView(boolean visible) {
-        if (visible) {
-            mTweetsRecyclerView.setVisibility(View.VISIBLE);
-        } else {
-            mTweetsRecyclerView.setVisibility(View.GONE);
-        }
+        showView(mTweetsRecyclerView, visible);
+    }
+
+    private void showErrorView(boolean visible) {
+        showView(mErrorView, visible);
+    }
+
+    private void showHelpView(boolean visible) {
+        showView(mHelpView, visible);
+    }
+
+    private void showView(View view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     public interface SearchFragmentListener {
