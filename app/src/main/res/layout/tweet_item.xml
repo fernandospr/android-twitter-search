@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            tools:text="6hs" />
+            tools:text="6hs ago" />
     </LinearLayout>
 
     <TextView
@@ -35,6 +35,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        tools:text="Content" />
+        tools:text="Content text" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="8dp"
+        tools:src="@color/colorAccent" />
 
 </LinearLayout>

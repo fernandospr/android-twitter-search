@@ -13,17 +13,20 @@ public class Tweet implements Parcelable {
     private final String username;
     private final String content;
     private final Date createdAt;
+    private final String imageUrl;
 
-    public Tweet(String username, String content, Date createdAt) {
+    public Tweet(String username, String content, Date createdAt, String imageUrl) {
         this.username = username;
         this.content = content;
         this.createdAt = createdAt;
+        this.imageUrl = imageUrl;
     }
 
     protected Tweet(Parcel in) {
         username = in.readString();
         content = in.readString();
         createdAt = new Date(in.readLong());
+        imageUrl = in.readString();
     }
 
     public static final Creator<Tweet> CREATOR = new Creator<Tweet>() {
@@ -44,7 +47,8 @@ public class Tweet implements Parcelable {
             String content = status.getText();
             String username = status.getUserName();
             Date createdAt = status.getCreatedAt();
-            tweetList.add(new Tweet(username, content, createdAt));
+            String imageUrl = status.getImageUrl();
+            tweetList.add(new Tweet(username, content, createdAt, imageUrl));
         }
         return tweetList;
     }
@@ -61,6 +65,10 @@ public class Tweet implements Parcelable {
         return createdAt;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -71,5 +79,6 @@ public class Tweet implements Parcelable {
         parcel.writeString(username);
         parcel.writeString(content);
         parcel.writeLong(createdAt.getTime());
+        parcel.writeString(imageUrl);
     }
 }

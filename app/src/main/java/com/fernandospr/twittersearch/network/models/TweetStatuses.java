@@ -1,5 +1,7 @@
 package com.fernandospr.twittersearch.network.models;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
@@ -20,6 +22,8 @@ public class TweetStatuses {
 
         private final User user;
 
+        private final Entities entities;
+
         private static class User {
             private final String name;
             @SerializedName("screen_name")
@@ -39,10 +43,39 @@ public class TweetStatuses {
             }
         }
 
-        private Status(Date createdAt, String text, User user) {
+        private static class Entities {
+            private final List<Media> media;
+
+            private static class Media {
+                @SerializedName("media_url_https")
+                private final String url;
+
+                private final String type;
+
+                public Media(String url, String type) {
+                    this.url = url;
+                    this.type = type;
+                }
+
+                public String getUrl() {
+                    return url;
+                }
+
+                public boolean isPhoto() {
+                    return "photo".equalsIgnoreCase(type) && !TextUtils.isEmpty(getUrl());
+                }
+            }
+
+            public Entities(List<Media> media) {
+                this.media = media;
+            }
+        }
+
+        public Status(Date createdAt, String text, User user, Entities entities) {
             this.createdAt = createdAt;
             this.text = text;
             this.user = user;
+            this.entities = entities;
         }
 
         public Date getCreatedAt() {
@@ -59,6 +92,17 @@ public class TweetStatuses {
 
         public String getUserScreenName() {
             return user.getScreenName();
+        }
+
+        public String getImageUrl() {
+            if (entities != null && entities.media != null) {
+                for (Entities.Media media : entities.media) {
+                    if (media.isPhoto()) {
+                        return media.getUrl();
+                    }
+                }
+            }
+            return null;
         }
     }
 
