@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.ViewHolder> {
@@ -43,7 +45,7 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
         if (TextUtils.isEmpty(imageUrl)) {
             holder.imageView.setVisibility(View.GONE);
         } else {
-            // FIXME: Async load the image
+            Glide.with(holder.imageView.getContext()).load(imageUrl).centerCrop().into(holder.imageView);
             holder.imageView.setVisibility(View.VISIBLE);
         }
     }
