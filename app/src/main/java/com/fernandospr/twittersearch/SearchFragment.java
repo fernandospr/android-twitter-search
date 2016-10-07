@@ -6,30 +6,23 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.fernandospr.twittersearch.repository.RepositoryCallback;
 import com.fernandospr.twittersearch.repository.TwitterRepository;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SearchFragment extends Fragment {
 
-    private final static long TIMER_DELAY = 1000;
-
-    private EditText mSearchEditText;
     private RecyclerView mTweetsRecyclerView;
     private TweetListAdapter mAdapter;
     private SearchFragmentListener mListener;
-    private Timer mTimer;
+    private ProgressBar mProgressBar;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -64,8 +57,8 @@ public class SearchFragment extends Fragment {
         mTweetsRecyclerView = (RecyclerView) view.findViewById(R.id.tweetsRecyclerView);
         setupTweetListView();
 
-        mSearchEditText = (EditText) view.findViewById(R.id.searchEditText);
-        setupSearchView();
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        hideLoading();
     }
 
     @Override
@@ -90,7 +83,6 @@ public class SearchFragment extends Fragment {
         if (mListener != null) {
             mListener.getRepository().stop();
         }
-        cancelScheduledSearch();
         mListener = null;
     }
 
@@ -100,49 +92,36 @@ public class SearchFragment extends Fragment {
         mTweetsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void setupSearchView() {
-        mSearchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // no-op
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // no-op
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String query = editable.toString();
-                cancelScheduledSearch();
-                if (TextUtils.isEmpty(query)) {
-                    showHelp();
-                } else {
-                    scheduleSearch(editable.toString());
-                }
-            }
-        });
+    private void showError(String message) {
+        showLoading(false);
+        // TODO: Show error
     }
 
-    private void cancelScheduledSearch() {
-        if (mTimer != null) {
-            mTimer.cancel();
+    private void showHelp() {
+        showLoading(false);
+        showRecyclerView(false);
+        // TODO: Show help
+    }
+
+    private void showTweetList(List<Tweet> tweetList) {
+        mAdapter.update(tweetList);
+        showLoading(false);
+        showRecyclerView(true);
+        // TODO: Check if empty
+    }
+
+    public void onQueryTextSubmit(String query) {
+        if (TextUtils.isEmpty(query)) {
+            showHelp();
+        } else {
+            getTweetList(query);
         }
-    }
-
-    private void scheduleSearch(final String query) {
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                getTweetList(query);
-            }
-        }, TIMER_DELAY);
     }
 
     private void getTweetList(String query) {
         if (mListener != null) {
+            showLoading(true);
+            showRecyclerView(false);
             mListener.getRepository().getTweetList(query, new RepositoryCallback<List<Tweet>>() {
                 @Override
                 public void onSuccess(List<Tweet> tweetList) {
@@ -157,17 +136,20 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    private void showError(String message) {
-        // TODO: Hide loading, show error
+    private void showLoading(boolean visible) {
+        if (visible) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
-    private void showHelp() {
-        // TODO: show help
-    }
-
-    private void showTweetList(List<Tweet> tweetList) {
-        mAdapter.update(tweetList);
-        // TODO: Hide loading, show recyclerview
+    private void showRecyclerView(boolean visible) {
+        if (visible) {
+            mTweetsRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            mTweetsRecyclerView.setVisibility(View.GONE);
+        }
     }
 
     public interface SearchFragmentListener {
