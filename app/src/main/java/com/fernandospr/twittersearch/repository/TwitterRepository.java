@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 
@@ -54,25 +55,35 @@ public class TwitterRepository {
         mConsumerSecret = consumerSecret;
     }
 
-    public void getTweetList(final String query, final RepositoryCallback<List<Tweet>> callback) {
+    public void getTweetList(String query, RepositoryCallback<List<Tweet>> callback) {
+        getTweetList(query, callback, 3);
+    }
+
+    private void getTweetList(String query, RepositoryCallback<List<Tweet>> callback, int retriesLeft) {
         String accessToken = getAccessToken();
         if (TextUtils.isEmpty(accessToken)) {
-            requestAccessToken(new RepositoryCallback<Void>() {
-                @Override
-                public void onSuccess(Void object) {
-                    doGetStatuses(query, callback);
-                }
-
-                @Override
-                public void onFailure(Throwable error) {
-                    if (callback != null) {
-                        callback.onFailure(new RuntimeException("Failed to authenticate"));
-                    }
-                }
-            });
+            requestAccessTokenAndGetTweetList(query, callback, retriesLeft);
         } else {
-            doGetStatuses(query, callback);
+            doGetTweetList(query, callback, retriesLeft);
         }
+    }
+
+    private void requestAccessTokenAndGetTweetList(final String query,
+                                                   final RepositoryCallback<List<Tweet>> callback,
+                                                   final int retriesLeft) {
+        requestAccessToken(new RepositoryCallback<Void>() {
+            @Override
+            public void onSuccess(Void object) {
+                doGetTweetList(query, callback, retriesLeft);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                if (callback != null) {
+                    callback.onFailure(new RuntimeException("Failed to authenticate"));
+                }
+            }
+        });
     }
 
     private void requestAccessToken(final RepositoryCallback<Void> callback) {
@@ -111,7 +122,7 @@ public class TwitterRepository {
     }
 
 
-    private void doGetStatuses(final String query, final RepositoryCallback<List<Tweet>> callback) {
+    private void doGetTweetList(final String query, final RepositoryCallback<List<Tweet>> callback, final int retriesLeft) {
         safeStop(mStatusesCall);
         mStatusesCall = mTwitterApi.getStatuses(getAccessToken(), query);
         mStatusesCall.enqueue(new Callback<TweetStatuses>() {
@@ -121,8 +132,12 @@ public class TwitterRepository {
                     if (response.isSuccessful()) {
                         callback.onSuccess(Tweet.buildTweets(response.body()));
                     } else {
-                        // TODO: Check if response is 401 then we have to request an access token and retry
-                        callback.onFailure(new RuntimeException("Failed to obtain statuses"));
+                        if (HttpURLConnection.HTTP_UNAUTHORIZED == response.code() && retriesLeft > 0) {
+                            removeAccessToken();
+                            getTweetList(query, callback, retriesLeft-1);
+                        } else {
+                            callback.onFailure(new RuntimeException("Failed to obtain statuses"));
+                        }
                     }
                 }
             }
@@ -134,6 +149,10 @@ public class TwitterRepository {
                 }
             }
         });
+    }
+
+    private void removeAccessToken() {
+        mSharedPreferences.edit().remove(SP_KEY_ACCESS_TOKEN).apply();
     }
 
     private void saveAccessToken(String accessToken) {
