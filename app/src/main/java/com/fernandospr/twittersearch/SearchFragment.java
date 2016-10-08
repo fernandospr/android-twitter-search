@@ -22,6 +22,7 @@ import java.util.List;
 public class SearchFragment extends Fragment {
 
     private static final String TWEET_LIST_KEY = "TWEET_LIST_KEY";
+    private static final String QUERY_KEY = "QUERY_KEY";
     private RecyclerView mTweetsRecyclerView;
     private TweetListAdapter mAdapter;
     private SearchFragmentListener mListener;
@@ -30,6 +31,7 @@ public class SearchFragment extends Fragment {
     private View mEmptyView;
     private View mErrorView;
     private View mHelpView;
+    private String mQuery;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -65,7 +67,9 @@ public class SearchFragment extends Fragment {
         mEmptyView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // FIXME
+                if (mListener != null) {
+                    mListener.requestSearchViewFocus();
+                }
             }
         });
 
@@ -73,7 +77,7 @@ public class SearchFragment extends Fragment {
         mErrorView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // FIXME
+                onQueryTextSubmit(mQuery);
             }
         });
 
@@ -81,7 +85,9 @@ public class SearchFragment extends Fragment {
         mHelpView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // FIXME
+                if (mListener != null) {
+                    mListener.requestSearchViewFocus();
+                }
             }
         });
     }
@@ -90,6 +96,7 @@ public class SearchFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
+            mQuery = savedInstanceState.getString(QUERY_KEY);
             mTweetList = savedInstanceState.getParcelableArrayList(TWEET_LIST_KEY);
             if (mTweetList != null) {
                 showTweetList(mTweetList);
@@ -106,6 +113,7 @@ public class SearchFragment extends Fragment {
         if (mTweetList != null) {
             outState.putParcelableArrayList(TWEET_LIST_KEY, new ArrayList<Parcelable>(mTweetList));
         }
+        outState.putString(QUERY_KEY, mQuery);
     }
 
     @Override
@@ -132,6 +140,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void getTweetList(String query) {
+        mQuery = query;
         if (mListener != null) {
             showLoading();
             mListener.getRepository().getTweetList(query, new RepositoryCallback<List<Tweet>>() {
@@ -157,6 +166,8 @@ public class SearchFragment extends Fragment {
     }
 
     private void showError(String message) {
+        mTweetList = null;
+
         showLoadingView(false);
         showEmptyView(false);
         showRecyclerView(false);
@@ -212,5 +223,6 @@ public class SearchFragment extends Fragment {
 
     public interface SearchFragmentListener {
         TwitterRepository getRepository();
+        void requestSearchViewFocus();
     }
 }
