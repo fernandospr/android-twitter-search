@@ -164,6 +164,8 @@ public class SearchFragment extends Fragment {
         showRecyclerView(!empty);
         showErrorView(false);
         showHelpView(false);
+
+        mTweetsRecyclerView.scrollToPosition(0);
     }
 
     private void showLoadingView(boolean visible) {
