@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.fernandospr.twittersearch.Tweet;
+import com.fernandospr.twittersearch.models.Tweet;
 import com.fernandospr.twittersearch.network.DateDeserializer;
 import com.fernandospr.twittersearch.network.TwitterApi;
 import com.fernandospr.twittersearch.network.models.Oauth2Token;

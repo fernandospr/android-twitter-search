@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.fernandospr.twittersearch.adapters.TweetListAdapter;
+import com.fernandospr.twittersearch.models.Tweet;
+import com.fernandospr.twittersearch.models.TweetDateFormatter;
 import com.fernandospr.twittersearch.repository.RepositoryCallback;
 import com.fernandospr.twittersearch.repository.TwitterRepository;
 

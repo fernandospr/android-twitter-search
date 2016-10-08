@@ -1,4 +1,4 @@
-package com.fernandospr.twittersearch;
+package com.fernandospr.twittersearch.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

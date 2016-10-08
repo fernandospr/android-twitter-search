@@ -1,4 +1,4 @@
-package com.fernandospr.twittersearch;
+package com.fernandospr.twittersearch.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.fernandospr.twittersearch.R;
+import com.fernandospr.twittersearch.models.TweetDateFormatter;
+import com.fernandospr.twittersearch.models.Tweet;
 
 import java.util.List;
 

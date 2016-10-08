@@ -1,6 +1,8 @@
-package com.fernandospr.twittersearch;
+package com.fernandospr.twittersearch.models;
 
 import android.content.Context;
+
+import com.fernandospr.twittersearch.R;
 
 import java.util.Date;
 
