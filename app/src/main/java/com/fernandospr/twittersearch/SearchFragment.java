@@ -11,7 +11,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.fernandospr.twittersearch.adapters.TweetListAdapter;
 import com.fernandospr.twittersearch.models.Tweet;
@@ -29,12 +30,13 @@ public class SearchFragment extends Fragment {
     private RecyclerView mTweetsRecyclerView;
     private TweetListAdapter mAdapter;
     private SearchFragmentListener mListener;
-    private ProgressBar mProgressBar;
+    private View mLoadingView;
     private List<Tweet> mTweetList;
     private View mEmptyView;
     private View mErrorView;
     private View mHelpView;
     private String mQuery;
+    private Animation mLoadingAnimation;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -64,7 +66,7 @@ public class SearchFragment extends Fragment {
         mTweetsRecyclerView = (RecyclerView) view.findViewById(R.id.tweetsRecyclerView);
         setupTweetListView();
 
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        mLoadingView = view.findViewById(R.id.loadingLogo);
 
         mEmptyView = view.findViewById(R.id.emptyView);
         mEmptyView.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +95,8 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
+
+        mLoadingAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.bounce);
     }
 
     @Override
@@ -201,7 +205,12 @@ public class SearchFragment extends Fragment {
     }
 
     private void showLoadingView(boolean visible) {
-        showView(mProgressBar, visible);
+        showView(mLoadingView, visible);
+        if (visible) {
+            mLoadingView.startAnimation(mLoadingAnimation);
+        } else {
+            mLoadingView.clearAnimation();
+        }
     }
 
     private void showEmptyView(boolean visible) {
