@@ -19,6 +19,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_weight="2"
+            android:textStyle="bold"
             tools:text="Username" />
 
         <TextView
@@ -34,8 +35,10 @@
         android:id="@+id/contentTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
         android:textSize="18sp"
-        tools:text="Content text" />
+        tools:text="Content text"
+        tools:targetApi="jelly_bean" />
 
     <ImageView
         android:id="@+id/imageView"

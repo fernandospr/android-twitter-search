@@ -62,10 +62,28 @@ public class SearchFragment extends Fragment {
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         mEmptyView = view.findViewById(R.id.emptyView);
+        mEmptyView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // FIXME
+            }
+        });
 
         mErrorView = view.findViewById(R.id.errorView);
+        mErrorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // FIXME
+            }
+        });
 
         mHelpView = view.findViewById(R.id.helpView);
+        mHelpView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // FIXME
+            }
+        });
     }
 
     @Override
