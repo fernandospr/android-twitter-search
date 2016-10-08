@@ -13,12 +13,13 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.ViewHolder> {
+public class TweetListAdapter extends AnimatedRecyclerViewAdapter<TweetListAdapter.ViewHolder> {
 
     private final TweetDateFormatter mFormatter;
     private List<Tweet> mTweetList;
 
-    public TweetListAdapter(TweetDateFormatter formatter) {
+    public TweetListAdapter(Context context, TweetDateFormatter formatter) {
+        super(context);
         this.mFormatter = formatter;
     }
 
@@ -29,23 +30,23 @@ public class TweetListAdapter extends RecyclerView.Adapter<TweetListAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
         View tweetItemView = inflater.inflate(R.layout.tweet_item, parent, false);
         return new ViewHolder(tweetItemView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
         Tweet tweet = mTweetList.get(position);
         holder.content.setText(tweet.getContent());
-        holder.createdAt.setText(mFormatter.format(holder.itemView.getContext(), tweet.getCreatedAt()));
+        holder.createdAt.setText(mFormatter.format(mContext, tweet.getCreatedAt()));
         holder.username.setText(tweet.getUsername());
         String imageUrl = tweet.getImageUrl();
         if (TextUtils.isEmpty(imageUrl)) {
             holder.imageView.setVisibility(View.GONE);
         } else {
-            Glide.with(holder.imageView.getContext()).load(imageUrl).centerCrop().into(holder.imageView);
+            Glide.with(mContext).load(imageUrl).centerCrop().into(holder.imageView);
             holder.imageView.setVisibility(View.VISIBLE);
         }
     }

@@ -126,9 +126,9 @@ public class SearchFragment extends Fragment {
     }
 
     private void setupTweetListView() {
-        mAdapter = new TweetListAdapter(new TweetDateFormatter());
+        mAdapter = new TweetListAdapter(getContext(), new TweetDateFormatter());
         mTweetsRecyclerView.setAdapter(mAdapter);
-        mTweetsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mTweetsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     public void onQueryTextSubmit(String query) {
@@ -223,6 +223,7 @@ public class SearchFragment extends Fragment {
 
     public interface SearchFragmentListener {
         TwitterRepository getRepository();
+
         void requestSearchViewFocus();
     }
 }
